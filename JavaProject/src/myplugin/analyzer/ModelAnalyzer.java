@@ -17,6 +17,7 @@ import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Class;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Enumeration;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Property;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Type;
+import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
 
 
 /** Model Analyzer takes necessary metadata from the MagicDraw model and puts it in 
@@ -105,7 +106,17 @@ public class ModelAnalyzer {
 			Property p = it.next();
 			FMProperty prop = getPropertyData(p, cl);
 			fmClass.addProperty(prop);	
-		}	
+		}
+		
+		Stereotype s = StereotypesHelper.getAppliedStereotypeByString(cl, "Entity");
+		
+		if(s != null) {
+			List<?> values = StereotypesHelper.getStereotypePropertyValue(cl, s, "tableName");
+			
+			if(!((values == null) || (values.size() == 0))) {
+				fmClass.setTableName(values.get(0).toString());
+			}
+		}
 		
 		/** @ToDo:
 		 * Add import declarations etc. */		

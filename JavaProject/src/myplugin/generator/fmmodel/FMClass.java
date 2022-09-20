@@ -8,6 +8,7 @@ import java.util.List;
 public class FMClass extends FMType {	
 	
 	private String visibility;
+	private String tableName;
 	
 
 	//Class properties
@@ -63,6 +64,14 @@ public class FMClass extends FMType {
 	public void setVisibility(String visibility) {
 		this.visibility = visibility;
 	}	
+	
+	public String getTableName() {
+		return tableName;
+	}
+	
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
 
 	
 	
