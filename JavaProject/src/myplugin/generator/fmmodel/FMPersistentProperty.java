@@ -10,12 +10,14 @@ public class FMPersistentProperty extends FMProperty {
 	private Boolean isKey;
 	private Boolean isUnique;
 	
-	public FMPersistentProperty(FMProperty fmProperty) {
+	public FMPersistentProperty(FMProperty fmProperty, String columnName, Integer length, Integer precision, Strategy strategy, Boolean isKey, Boolean isUnique) {
 		super(fmProperty.getName(), fmProperty.getType(), fmProperty.getVisibility(), fmProperty.getLower(), fmProperty.getUpper());
 		
-		strategy = Strategy.NONE;
-		isKey = false;
-		isUnique = false;
+		this.columnName = columnName;
+		this.length = length;
+		this.strategy = strategy;
+		this.isKey = isKey;
+		this.isUnique = isUnique;
 	}
 	
 	public String getColumnName() {

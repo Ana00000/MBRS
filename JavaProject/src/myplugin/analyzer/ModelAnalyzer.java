@@ -7,6 +7,9 @@ import myplugin.generator.fmmodel.FMClass;
 import myplugin.generator.fmmodel.FMEnumeration;
 import myplugin.generator.fmmodel.FMModel;
 import myplugin.generator.fmmodel.FMProperty;
+import myplugin.generator.fmmodel.FMPersistentProperty;
+import myplugin.generator.fmmodel.FMReferencedProperty;
+import myplugin.generator.fmmodel.Strategy;
 
 import com.nomagic.uml2.ext.jmi.helpers.ModelHelper;
 import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
@@ -143,8 +146,62 @@ public class ModelAnalyzer {
 		
 		FMProperty prop = new FMProperty(attName, typeName, p.getVisibility().toString(), 
 				lower, upper);
+		
+		Stereotype persistentStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "PersistentProperty");
+		
+		if(persistentStereotype != null) {
+			prop = createPersistentProperty(prop, p, persistentStereotype);
+		}
+		
+		
 		return prop;		
 	}	
+	
+	private FMPersistentProperty createPersistentProperty(FMProperty prop, Property p, Stereotype s) {
+		
+		String columnName = null;
+		Integer length = null;
+		Integer precision = null;
+		Strategy strategy = null;
+		Boolean isKey = null;
+		Boolean isUnique = null;
+		
+		List<Property> tags = s.getOwnedAttribute();
+		for(int i=0; i<tags.size(); i++) {
+			Property tag = tags.get(i);
+			String tagName = tag.getName();
+			List<?> values = StereotypesHelper.getStereotypePropertyValue(p, s, tagName);
+			
+			if(values.size() > 0) {
+				switch(tagName) {
+					case "columnName":
+						columnName = (String) values.get(0);
+						break;
+					case "length":
+						length = (Integer) values.get(0);
+						break;
+					case "precision":
+						precision = (Integer) values.get(0);
+						break;
+					case "strategy":
+						strategy = (Strategy) values.get(0);
+						break;
+					case "isKey":
+						isKey = (Boolean) values.get(0);
+						break;
+					case "isUnique":
+						isUnique = (Boolean) values.get(0);
+						break;
+					
+				}
+			}
+		}
+		
+		
+		FMPersistentProperty newProp = new FMPersistentProperty(prop, columnName, length, precision, strategy, isKey, isUnique);
+		
+		return newProp;
+	}
 	
 	private FMEnumeration getEnumerationData(Enumeration enumeration, String packageName) throws AnalyzeException {
 		FMEnumeration fmEnum = new FMEnumeration(enumeration.getName(), packageName);
