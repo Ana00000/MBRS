@@ -2,6 +2,7 @@ package myplugin.analyzer;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collection;
 
 import myplugin.generator.fmmodel.FMClass;
 import myplugin.generator.fmmodel.FMEnumeration;
@@ -155,7 +156,7 @@ public class ModelAnalyzer {
 			prop = createPersistentProperty(prop, p, persistentStereotype);
 		}
 		
-		Stereotype referencedStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "ReferencedProperty");
+		Stereotype referencedStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "ManyToOne");
 		
 		if(referencedStereotype != null) {
 			prop = createReferencedProperty(prop, p, referencedStereotype);
@@ -193,7 +194,9 @@ public class ModelAnalyzer {
 						precision = (Integer) values.get(0);
 						break;
 					case "strategy":
-						strategy = (Strategy) values.get(0);
+						if(values.get(0) instanceof EnumerationLiteral) {
+							strategy = Strategy.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
+						}
 						break;
 					case "isKey":
 						isKey = (Boolean) values.get(0);
@@ -220,6 +223,14 @@ public class ModelAnalyzer {
 		String joinTable = null;
 		
 		List<Property> tags = s.getOwnedAttribute();
+		Collection<?> inheritedTags = (Collection<?>)s.getInheritedMember();
+		
+		for(Iterator<?> i = inheritedTags.iterator(); i.hasNext();) {
+			tags.add((Property)i.next());
+		}
+		
+		
+		
 		for(int i=0; i<tags.size(); i++) {
 			Property tag = tags.get(i);
 			String tagName = tag.getName();
@@ -230,11 +241,15 @@ public class ModelAnalyzer {
 					case "columnName":
 						columnName = (String) values.get(0);
 						break;
-					case "fetchType":
-						fetch = (FetchType) values.get(0);
+					case "fetch":
+						if(values.get(0) instanceof EnumerationLiteral) {
+							fetch = FetchType.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
+						}
 						break;
 					case "cascade":
-						cascade = (CascadeType) values.get(0);
+						if(values.get(0) instanceof EnumerationLiteral) {
+							cascade = CascadeType.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
+						}
 						break;
 					case "joinTable":
 						joinTable = (String) values.get(0);
@@ -244,6 +259,7 @@ public class ModelAnalyzer {
 			}
 		}
 		
+		
 		Property oppositeEnd = p.getOpposite();
 		
 		FMReferencedProperty newProp = new FMReferencedProperty(prop);
@@ -252,12 +268,19 @@ public class ModelAnalyzer {
 		newProp.setColumnName(columnName);
 		newProp.setJoinTable(joinTable);
 		
-		//FMProperty fmp = new FMProperty(oppositeEnd.getName(), oppositeEnd.getType(), oppositeEnd.getVisibility().toString(), (Integer)oppositeEnd.getLower(), (Integer)oppositeEnd.getUpper());
 		
-		//newProp.setOppositeEnd(new FMReferencedProperty());
+		FMProperty fmp = new FMProperty(oppositeEnd.getName(), oppositeEnd.getType().toString(), oppositeEnd.getVisibility().toString(), (Integer)oppositeEnd.getLower(), (Integer)oppositeEnd.getUpper());
+		
+		newProp.setOppositeEnd(new FMReferencedProperty(fmp));
 		
 		return newProp;
 	
+	}
+	
+	private String getEnumerationString(EnumerationLiteral en) {
+		String enumString = en.getName();
+		
+		return enumString;
 	}
 	
 	private FMEnumeration getEnumerationData(Enumeration enumeration, String packageName) throws AnalyzeException {
