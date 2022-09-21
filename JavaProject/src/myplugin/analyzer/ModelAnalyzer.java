@@ -2,11 +2,17 @@ package myplugin.analyzer;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collection;
 
 import myplugin.generator.fmmodel.FMClass;
 import myplugin.generator.fmmodel.FMEnumeration;
 import myplugin.generator.fmmodel.FMModel;
 import myplugin.generator.fmmodel.FMProperty;
+import myplugin.generator.fmmodel.FMPersistentProperty;
+import myplugin.generator.fmmodel.FMReferencedProperty;
+import myplugin.generator.fmmodel.Strategy;
+import myplugin.generator.fmmodel.FetchType;
+import myplugin.generator.fmmodel.CascadeType;
 
 import com.nomagic.uml2.ext.jmi.helpers.ModelHelper;
 import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
@@ -17,6 +23,7 @@ import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Class;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Enumeration;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Property;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Type;
+import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
 
 
 /** Model Analyzer takes necessary metadata from the MagicDraw model and puts it in 
@@ -105,7 +112,17 @@ public class ModelAnalyzer {
 			Property p = it.next();
 			FMProperty prop = getPropertyData(p, cl);
 			fmClass.addProperty(prop);	
-		}	
+		}
+		
+		Stereotype s = StereotypesHelper.getAppliedStereotypeByString(cl, "Entity");
+		
+		if(s != null) {
+			List<?> values = StereotypesHelper.getStereotypePropertyValue(cl, s, "tableName");
+			
+			if(!((values == null) || (values.size() == 0))) {
+				fmClass.setTableName(values.get(0).toString());
+			}
+		}
 		
 		/** @ToDo:
 		 * Add import declarations etc. */		
@@ -132,8 +149,139 @@ public class ModelAnalyzer {
 		
 		FMProperty prop = new FMProperty(attName, typeName, p.getVisibility().toString(), 
 				lower, upper);
+		
+		Stereotype persistentStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "PersistentProperty");
+		
+		if(persistentStereotype != null) {
+			prop = createPersistentProperty(prop, p, persistentStereotype);
+		}
+		
+		Stereotype referencedStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "ManyToOne");
+		
+		if(referencedStereotype != null) {
+			prop = createReferencedProperty(prop, p, referencedStereotype);
+		}
+		
+		
+		
 		return prop;		
 	}	
+	
+	private FMPersistentProperty createPersistentProperty(FMProperty prop, Property p, Stereotype s) {
+		
+		String columnName = null;
+		Integer length = null;
+		Integer precision = null;
+		Strategy strategy = null;
+		Boolean isKey = null;
+		Boolean isUnique = null;
+		
+		List<Property> tags = s.getOwnedAttribute();
+		for(int i=0; i<tags.size(); i++) {
+			Property tag = tags.get(i);
+			String tagName = tag.getName();
+			List<?> values = StereotypesHelper.getStereotypePropertyValue(p, s, tagName);
+			
+			if(values.size() > 0) {
+				switch(tagName) {
+					case "columnName":
+						columnName = (String) values.get(0);
+						break;
+					case "length":
+						length = (Integer) values.get(0);
+						break;
+					case "precision":
+						precision = (Integer) values.get(0);
+						break;
+					case "strategy":
+						if(values.get(0) instanceof EnumerationLiteral) {
+							strategy = Strategy.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
+						}
+						break;
+					case "isKey":
+						isKey = (Boolean) values.get(0);
+						break;
+					case "isUnique":
+						isUnique = (Boolean) values.get(0);
+						break;
+					
+				}
+			}
+		}
+		
+		
+		FMPersistentProperty newProp = new FMPersistentProperty(prop, columnName, length, precision, strategy, isKey, isUnique);
+		
+		return newProp;
+	}
+	
+	private FMReferencedProperty createReferencedProperty(FMProperty prop, Property p, Stereotype s) {
+		
+		FetchType fetch = null;
+		CascadeType cascade = null;
+		String columnName = null;
+		String joinTable = null;
+		
+		List<Property> tags = s.getOwnedAttribute();
+		Collection<?> inheritedTags = (Collection<?>)s.getInheritedMember();
+		
+		for(Iterator<?> i = inheritedTags.iterator(); i.hasNext();) {
+			tags.add((Property)i.next());
+		}
+		
+		
+		
+		for(int i=0; i<tags.size(); i++) {
+			Property tag = tags.get(i);
+			String tagName = tag.getName();
+			List<?> values = StereotypesHelper.getStereotypePropertyValue(p, s, tagName);
+			
+			if(values.size() > 0) {
+				switch(tagName) {
+					case "columnName":
+						columnName = (String) values.get(0);
+						break;
+					case "fetch":
+						if(values.get(0) instanceof EnumerationLiteral) {
+							fetch = FetchType.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
+						}
+						break;
+					case "cascade":
+						if(values.get(0) instanceof EnumerationLiteral) {
+							cascade = CascadeType.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
+						}
+						break;
+					case "joinTable":
+						joinTable = (String) values.get(0);
+						break;
+					
+				}
+			}
+		}
+		
+		
+		Property oppositeEnd = p.getOpposite();
+		
+		FMReferencedProperty newProp = new FMReferencedProperty(prop);
+		newProp.setFetchType(fetch);
+		newProp.setCascadeType(cascade);
+		newProp.setColumnName(columnName);
+		newProp.setJoinTable(joinTable);
+		
+		
+		FMProperty fmp = new FMProperty(oppositeEnd.getName(), oppositeEnd.getType().toString(), oppositeEnd.getVisibility().toString(), (Integer)oppositeEnd.getLower(), (Integer)oppositeEnd.getUpper());
+		
+		newProp.setOppositeEnd(new FMReferencedProperty(fmp));
+		
+		return newProp;
+	
+	}
+	
+	private String getEnumerationString(EnumerationLiteral en) {
+		String enumString = en.getName();
+		
+		return enumString;
+	}
 	
 	private FMEnumeration getEnumerationData(Enumeration enumeration, String packageName) throws AnalyzeException {
 		FMEnumeration fmEnum = new FMEnumeration(enumeration.getName(), packageName);
