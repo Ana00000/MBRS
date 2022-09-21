@@ -10,6 +10,8 @@ import myplugin.generator.fmmodel.FMProperty;
 import myplugin.generator.fmmodel.FMPersistentProperty;
 import myplugin.generator.fmmodel.FMReferencedProperty;
 import myplugin.generator.fmmodel.Strategy;
+import myplugin.generator.fmmodel.FetchType;
+import myplugin.generator.fmmodel.CascadeType;
 
 import com.nomagic.uml2.ext.jmi.helpers.ModelHelper;
 import com.nomagic.uml2.ext.jmi.helpers.StereotypesHelper;
@@ -153,6 +155,13 @@ public class ModelAnalyzer {
 			prop = createPersistentProperty(prop, p, persistentStereotype);
 		}
 		
+		Stereotype referencedStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "ReferencedProperty");
+		
+		if(referencedStereotype != null) {
+			prop = createReferencedProperty(prop, p, referencedStereotype);
+		}
+		
+		
 		
 		return prop;		
 	}	
@@ -201,6 +210,54 @@ public class ModelAnalyzer {
 		FMPersistentProperty newProp = new FMPersistentProperty(prop, columnName, length, precision, strategy, isKey, isUnique);
 		
 		return newProp;
+	}
+	
+	private FMReferencedProperty createReferencedProperty(FMProperty prop, Property p, Stereotype s) {
+		
+		FetchType fetch = null;
+		CascadeType cascade = null;
+		String columnName = null;
+		String joinTable = null;
+		
+		List<Property> tags = s.getOwnedAttribute();
+		for(int i=0; i<tags.size(); i++) {
+			Property tag = tags.get(i);
+			String tagName = tag.getName();
+			List<?> values = StereotypesHelper.getStereotypePropertyValue(p, s, tagName);
+			
+			if(values.size() > 0) {
+				switch(tagName) {
+					case "columnName":
+						columnName = (String) values.get(0);
+						break;
+					case "fetchType":
+						fetch = (FetchType) values.get(0);
+						break;
+					case "cascade":
+						cascade = (CascadeType) values.get(0);
+						break;
+					case "joinTable":
+						joinTable = (String) values.get(0);
+						break;
+					
+				}
+			}
+		}
+		
+		Property oppositeEnd = p.getOpposite();
+		
+		FMReferencedProperty newProp = new FMReferencedProperty(prop);
+		newProp.setFetchType(fetch);
+		newProp.setCascadeType(cascade);
+		newProp.setColumnName(columnName);
+		newProp.setJoinTable(joinTable);
+		
+		//FMProperty fmp = new FMProperty(oppositeEnd.getName(), oppositeEnd.getType(), oppositeEnd.getVisibility().toString(), (Integer)oppositeEnd.getLower(), (Integer)oppositeEnd.getUpper());
+		
+		//newProp.setOppositeEnd(new FMReferencedProperty());
+		
+		return newProp;
+	
 	}
 	
 	private FMEnumeration getEnumerationData(Enumeration enumeration, String packageName) throws AnalyzeException {
