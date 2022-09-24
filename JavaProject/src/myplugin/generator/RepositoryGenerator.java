@@ -13,18 +13,10 @@ import myplugin.generator.fmmodel.FMClass;
 import myplugin.generator.fmmodel.FMModel;
 import myplugin.generator.options.GeneratorOptions;
 
-/**
- * EJB generator that now generates incomplete ejb classes based on MagicDraw
- * class model
- * 
- * @ToDo: enhance resources/templates/ejbclass.ftl template and intermediate
- *        data structure (@see myplugin.generator.fmmodel) in order to generate
- *        complete ejb classes
- */
 
-public class EJBGenerator extends BasicGenerator {
+public class RepositoryGenerator  extends BasicGenerator {
 
-	public EJBGenerator(GeneratorOptions generatorOptions) {
+	public RepositoryGenerator(GeneratorOptions generatorOptions) {
 		super(generatorOptions);
 	}
 
@@ -36,6 +28,7 @@ public class EJBGenerator extends BasicGenerator {
 			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 
+		
 		List<FMClass> classes = FMModel.getInstance().getClasses();
 		for (int i = 0; i < classes.size(); i++) {
 			FMClass cl = classes.get(i);
@@ -48,7 +41,6 @@ public class EJBGenerator extends BasicGenerator {
 					context.put("class", cl);
 					context.put("properties", cl.getProperties());
 					context.put("importedPackages", cl.getImportedPackages());
-					context.put("referencedProperties", cl.getReferencedProperties());
 					getTemplate().process(context, out);
 					out.flush();
 				}

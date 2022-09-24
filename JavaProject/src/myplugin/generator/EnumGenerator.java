@@ -8,23 +8,18 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
+import com.nomagic.magicdraw.core.Application;
+
 import freemarker.template.TemplateException;
-import myplugin.generator.fmmodel.FMClass;
+import myplugin.generator.fmmodel.FMEnumeration;
 import myplugin.generator.fmmodel.FMModel;
 import myplugin.generator.options.GeneratorOptions;
 
-/**
- * EJB generator that now generates incomplete ejb classes based on MagicDraw
- * class model
- * 
- * @ToDo: enhance resources/templates/ejbclass.ftl template and intermediate
- *        data structure (@see myplugin.generator.fmmodel) in order to generate
- *        complete ejb classes
- */
+public class EnumGenerator extends BasicGenerator {
 
-public class EJBGenerator extends BasicGenerator {
+	public final String PROJECT_NAME = Application.getInstance().getProject().getName();
 
-	public EJBGenerator(GeneratorOptions generatorOptions) {
+	public EnumGenerator(GeneratorOptions generatorOptions) {
 		super(generatorOptions);
 	}
 
@@ -36,19 +31,18 @@ public class EJBGenerator extends BasicGenerator {
 			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 
-		List<FMClass> classes = FMModel.getInstance().getClasses();
-		for (int i = 0; i < classes.size(); i++) {
-			FMClass cl = classes.get(i);
+		List<FMEnumeration> enums = FMModel.getInstance().getEnumerations();
+		
+		for(FMEnumeration en : enums) {
 			Writer out;
 			Map<String, Object> context = new HashMap<String, Object>();
 			try {
-				out = getWriter(cl.getName(), cl.getTypePackage());
+				out = getWriter(en.getName(), en.getTypePackage());
 				if (out != null) {
 					context.clear();
-					context.put("class", cl);
-					context.put("properties", cl.getProperties());
-					context.put("importedPackages", cl.getImportedPackages());
-					context.put("referencedProperties", cl.getReferencedProperties());
+					context.put("enum", en);
+					context.put("app_name", PROJECT_NAME);
+					context.put("values", en.getValues());
 					getTemplate().process(context, out);
 					out.flush();
 				}
