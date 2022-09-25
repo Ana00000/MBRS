@@ -13,7 +13,6 @@ import myplugin.generator.fmmodel.FMClass;
 import myplugin.generator.fmmodel.FMModel;
 import myplugin.generator.options.GeneratorOptions;
 
-
 public class RepositoryGenerator  extends BasicGenerator {
 
 	public RepositoryGenerator(GeneratorOptions generatorOptions) {
@@ -21,13 +20,11 @@ public class RepositoryGenerator  extends BasicGenerator {
 	}
 
 	public void generate() {
-
 		try {
 			super.generate();
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
-
 		
 		List<FMClass> classes = FMModel.getInstance().getClasses();
 		for (int i = 0; i < classes.size(); i++) {

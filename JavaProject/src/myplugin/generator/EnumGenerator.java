@@ -3,7 +3,6 @@ package myplugin.generator;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
@@ -24,16 +23,13 @@ public class EnumGenerator extends BasicGenerator {
 	}
 
 	public void generate() {
-
 		try {
 			super.generate();
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 
-		List<FMEnumeration> enums = FMModel.getInstance().getEnumerations();
-		
-		for(FMEnumeration en : enums) {
+		for(FMEnumeration en : FMModel.getInstance().getEnumerations()) {
 			Writer out;
 			Map<String, Object> context = new HashMap<String, Object>();
 			try {

@@ -2,7 +2,6 @@ package myplugin.generator.options;
 
 /** GeneratorOptions: options used for code generation. Every generator (ejb generator, forms generator etc) should
  * have one instance of this class */
-
 public class GeneratorOptions  {
 	private String outputPath; 
 	private String templateName;
@@ -70,6 +69,4 @@ public class GeneratorOptions  {
 	public void setFilePackage(String filePackage) {
 		this.filePackage = filePackage;
 	}
-	
-	
 }

@@ -19,6 +19,7 @@ import myplugin.generator.options.GeneratorOptions;
 
 public abstract class BasicGenerator {
 
+	@SuppressWarnings("unused")
 	private GeneratorOptions generatorOptions; 
 	private String outputPath;	
 	private String templateName;
@@ -54,18 +55,14 @@ public abstract class BasicGenerator {
 		}
 
 		cfg = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);		
-
 		final String tName = templateName + ".ftl";
 		try {
 			cfg.setDirectoryForTemplateLoading(new File(templateDir));
 			template = cfg.getTemplate(tName);
-			DefaultObjectWrapperBuilder builder = 
-					new DefaultObjectWrapperBuilder(cfg.getIncompatibleImprovements());
-			cfg.setObjectWrapper(builder.build());
+			cfg.setObjectWrapper(new DefaultObjectWrapperBuilder(cfg.getIncompatibleImprovements()).build());
 			File op = new File(outputPath);
 			if (!op.exists() && !op.mkdirs()) {
-					throw new IOException(
-							"An error occurred during folder creation " + outputPath);
+					throw new IOException("An error occurred during folder creation " + outputPath);
 			}
 		} catch (IOException e) {
 			throw new IOException("Can't find template " + tName + ".", e);
@@ -82,15 +79,12 @@ public abstract class BasicGenerator {
 		String fullPath = outputPath
 				+ File.separator
 				+ (filePackage.isEmpty() ? "" : packageToPath(filePackage)
-						+ File.separator)
+				+ File.separator)
 				+ outputFileName.replace("{0}", fileNamePart);
 
 		File of = new File(fullPath);
-		if (!of.getParentFile().exists()) {
-			if (!of.getParentFile().mkdirs()) {
-				throw new IOException("An error occurred during output folder creation "
-						+ outputPath);
-			}
+		if (!of.getParentFile().exists() && !of.getParentFile().mkdirs()) {
+			throw new IOException("An error occurred during output folder creation " + outputPath);
 		}
 
 		System.out.println(of.getPath());
@@ -99,9 +93,7 @@ public abstract class BasicGenerator {
 		if (!isOverwrite() && of.exists()) {
 			return null;
 		}
-
 		return new OutputStreamWriter(new FileOutputStream(of));
-
 	}
 
 	protected String packageToPath(String pack) {
@@ -118,7 +110,6 @@ public abstract class BasicGenerator {
 
 	public Writer getWriter() throws IOException {
 		return getWriter("", filePackage);
-
 	}
 
 	public void setOutputPath(String output) {
@@ -184,5 +175,4 @@ public abstract class BasicGenerator {
 	protected String uncapFirst(String string) {
 		return Character.toLowerCase(string.charAt(0)) + string.substring(1);
 	}
-	
 }

@@ -13,7 +13,6 @@ import myplugin.generator.fmmodel.FMClass;
 import myplugin.generator.fmmodel.FMModel;
 import myplugin.generator.options.GeneratorOptions;
 
-
 public class ControllerGenerator extends BasicGenerator {
 
 	public ControllerGenerator(GeneratorOptions generatorOptions) {
@@ -21,7 +20,6 @@ public class ControllerGenerator extends BasicGenerator {
 	}
 
 	public void generate() {
-
 		try {
 			super.generate();
 		} catch (IOException e) {

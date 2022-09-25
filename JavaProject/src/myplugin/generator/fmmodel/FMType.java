@@ -1,7 +1,6 @@
 package myplugin.generator.fmmodel;
 
 public class FMType extends FMElement {	
-
 	public String getTypePackage() {
 		return typePackage;
 	}
@@ -18,5 +17,4 @@ public class FMType extends FMElement {
 	//Qualified package name, used for import declaration 
 	//Empty string for standard library types
 	private String typePackage;
-
 }

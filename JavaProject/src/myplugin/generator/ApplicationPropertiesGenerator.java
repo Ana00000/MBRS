@@ -19,10 +19,6 @@ public class ApplicationPropertiesGenerator extends BasicGenerator {
 	}
 
 	public void generate() {
-
-		String applicationproperties = "application.properties";
-		String packageName = "";
-
 		try {
 			super.generate();
 		} catch (IOException e) {
@@ -32,12 +28,11 @@ public class ApplicationPropertiesGenerator extends BasicGenerator {
 		Writer out;
 		Map<String, Object> context = new HashMap<String, Object>();
 		try {
-			out = getWriter(applicationproperties, packageName);
+			out = getWriter("application.properties", "");
 			context.clear();
 			context.put("app_name", PROJECT_NAME);
 			getTemplate().process(context, out);
 			out.flush();
-
 		} catch (TemplateException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage());
 		} catch (IOException e) {

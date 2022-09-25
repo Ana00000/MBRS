@@ -16,31 +16,27 @@ public class FMModel {
 	//....
 	/** @ToDo: Add lists of other elements, if needed */
 	private FMModel() {
-		
 	}
 	
 	private static FMModel model;
 	
 	public static FMModel getInstance() {
-		if (model == null) {
-			model = new FMModel();			
-		}
-		return model;
+		return model == null ? new FMModel() : model;
 	}
 	
 	public List<FMClass> getClasses() {
 		return classes;
 	}
+	
 	public void setClasses(List<FMClass> classes) {
 		this.classes = classes;
 	}
+	
 	public List<FMEnumeration> getEnumerations() {
 		return enumerations;
 	}
+	
 	public void setEnumerations(List<FMEnumeration> enumerations) {
 		this.enumerations = enumerations;
 	}
-
-
-
 }

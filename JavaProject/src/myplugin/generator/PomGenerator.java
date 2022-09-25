@@ -20,10 +20,6 @@ public class PomGenerator extends BasicGenerator {
 	}
 
 	public void generate() {
-
-		String pom = "pom";
-		String packageName = "";
-
 		try {
 			super.generate();
 		} catch (IOException e) {
@@ -33,7 +29,7 @@ public class PomGenerator extends BasicGenerator {
 		Writer out;
 		Map<String, Object> context = new HashMap<String, Object>();
 		try {
-			out = getWriter(pom, packageName);
+			out = getWriter("pom", "");
 			if (out != null) {
 				context.clear();
 				context.put("project_name", PROJECT_NAME);
