@@ -12,6 +12,7 @@ public class ProjectOptions {
 	//List of UML 2.0 to java (or any other destination language) mappings	
 	private List<TypeMapping> typeMappings = new ArrayList<TypeMapping>();
 	
+	//Hash map for linking generators with its options
 	private Map<String, GeneratorOptions> generatorOptions = new HashMap<String, GeneratorOptions>();
 	
 	private static ProjectOptions projectOptions = null; 
@@ -32,10 +33,13 @@ public class ProjectOptions {
 		this.generatorOptions = generatorOptions;
 	}
 	
-	private ProjectOptions() {
+	private ProjectOptions() {		
 	}
 	
 	public static ProjectOptions getProjectOptions() {
-		return projectOptions == null ? new ProjectOptions() : projectOptions;
+		if (projectOptions ==null) { 
+			projectOptions = new ProjectOptions();	
+		}	
+		return projectOptions;
 	}
 }
