@@ -21,7 +21,10 @@ public class FMModel {
 	private static FMModel model;
 	
 	public static FMModel getInstance() {
-		return model == null ? new FMModel() : model;
+		if (model == null) {
+			return new FMModel();
+		}
+		return model;
 	}
 	
 	public List<FMClass> getClasses() {

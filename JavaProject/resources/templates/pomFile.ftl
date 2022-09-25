@@ -11,8 +11,8 @@
 	<groupId>com.example</groupId>
 	<artifactId>demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>${appName}</name>
-	<description>${appDescription}</description>
+	<name>PluginDevelopment</name>
+	<description>PluginDevelopment</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>

@@ -18,10 +18,12 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import myplugin.analyzer.AnalyzeException;
 import myplugin.analyzer.ModelAnalyzer;
+import myplugin.generator.ApplicationPropertiesGenerator;
 import myplugin.generator.ControllerGenerator;
 import myplugin.generator.EJBGenerator;
 import myplugin.generator.EnumGenerator;
 import myplugin.generator.MainGenerator;
+import myplugin.generator.PomGenerator;
 import myplugin.generator.RepositoryGenerator;
 import myplugin.generator.ServiceGenerator;
 import myplugin.generator.ServiceImplGenerator;
@@ -74,11 +76,11 @@ class GenerateAction extends MDAction{
 			showGeneratedDialog(serviceImplGeneratorOptions);
 			
 			GeneratorOptions pomGeneratorOptions = generatorOptions.get("PomGenerator");
-			//new PomGenerator(pomGeneratorOptions).generate();
+			new PomGenerator(pomGeneratorOptions).generate();
 			showGeneratedDialog(pomGeneratorOptions);
 			
 			GeneratorOptions applicationPropertiesGeneratorOptions = generatorOptions.get("ApplicationPropertiesGenerator");
-			//new ApplicationPropertiesGenerator(applicationPropertiesGeneratorOptions).generate();
+			new ApplicationPropertiesGenerator(applicationPropertiesGeneratorOptions).generate();
 			showGeneratedDialog(applicationPropertiesGeneratorOptions);
 			
 			exportToXml();
