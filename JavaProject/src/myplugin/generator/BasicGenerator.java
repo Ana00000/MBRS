@@ -62,7 +62,7 @@ public abstract class BasicGenerator {
 			cfg.setObjectWrapper(new DefaultObjectWrapperBuilder(cfg.getIncompatibleImprovements()).build());
 			File op = new File(outputPath);
 			if (!op.exists() && !op.mkdirs()) {
-					throw new IOException("An error occurred during folder creation " + outputPath);
+				 throw new IOException("An error occurred during folder creation " + outputPath);
 			}
 		} catch (IOException e) {
 			throw new IOException("Can't find template " + tName + ".", e);

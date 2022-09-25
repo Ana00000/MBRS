@@ -24,7 +24,7 @@ public class MyPlugin extends Plugin {
 		
 		Map<String, GeneratorOptions> generatorOptions = ProjectOptions.getProjectOptions().getGeneratorOptions();
 		pluginDir = getDescriptor().getPluginDirectory().getPath();
-		String rootDir = System.getProperty("user.home") + File.separator + "naziv_projekta";
+		String rootDir = System.getProperty("user.home") + File.separator + "PluginDevelopment";
 		String javaDir = rootDir + File.separator + "src" + File.separator + "main" + File.separator + "java";
 		
 		//for test purpose only:
