@@ -34,7 +34,6 @@ public class ProjectOptions {
 	}
 	
 	private ProjectOptions() {		
-		
 	}
 	
 	public static ProjectOptions getProjectOptions() {
@@ -43,5 +42,4 @@ public class ProjectOptions {
 		}	
 		return projectOptions;
 	}
-
 }

@@ -1,22 +1,21 @@
 package myplugin.generator.fmmodel;
 
-
 public class FMPersistentProperty extends FMProperty {
-	
 	private String columnName;
 	private Integer length;
 	private Integer precision;
 	private Strategy strategy;
 	private Boolean isKey;
+	private Boolean isNullable;
 	private Boolean isUnique;
 	
-	public FMPersistentProperty(FMProperty fmProperty, String columnName, Integer length, Integer precision, Strategy strategy, Boolean isKey, Boolean isUnique) {
+	public FMPersistentProperty(FMProperty fmProperty, String columnName, Integer length, Integer precision, Strategy strategy, Boolean isKey, Boolean isNullable, Boolean isUnique) {
 		super(fmProperty.getName(), fmProperty.getType(), fmProperty.getVisibility(), fmProperty.getLower(), fmProperty.getUpper());
-		
 		this.columnName = columnName;
 		this.length = length;
 		this.strategy = strategy;
 		this.isKey = isKey;
+		this.isNullable = isNullable;
 		this.isUnique = isUnique;
 	}
 	
@@ -59,6 +58,14 @@ public class FMPersistentProperty extends FMProperty {
 	public void setIsKey(Boolean isKey) {
 		this.isKey = isKey;
 	}
+	
+	public Boolean getIsNullable() {
+		return isNullable;
+	}
+
+	public void setIsNullable(Boolean isNullable) {
+		this.isNullable = isNullable;
+	}
 
 	public Boolean getIsUnique() {
 		return isUnique;
@@ -67,15 +74,4 @@ public class FMPersistentProperty extends FMProperty {
 	public void setIsUnique(Boolean isUnique) {
 		this.isUnique = isUnique;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 }

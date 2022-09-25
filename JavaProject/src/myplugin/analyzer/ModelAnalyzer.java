@@ -2,7 +2,6 @@ package myplugin.analyzer;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Collection;
 
 import myplugin.generator.fmmodel.FMClass;
 import myplugin.generator.fmmodel.FMEnumeration;
@@ -25,15 +24,11 @@ import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Property;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Type;
 import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
 
-
 /** Model Analyzer takes necessary metadata from the MagicDraw model and puts it in 
  * the intermediate data structure (@see myplugin.generator.fmmodel.FMModel) optimized
  * for code generation using freemarker. Model Analyzer now takes metadata only for ejb code 
  * generation
-
- * @ToDo: Enhance (or completely rewrite) myplugin.generator.fmmodel classes and  
- * Model Analyzer methods in order to support GUI generation. */ 
-
+ * */ 
 
 public class ModelAnalyzer {	
 	//root model package
@@ -47,10 +42,6 @@ public class ModelAnalyzer {
 		this.root = root;
 		this.filePackage = filePackage;
 	}
-
-	public Package getRoot() {
-		return root;
-	}
 	
 	public void prepareModel() throws AnalyzeException {
 		FMModel.getInstance().getClasses().clear();
@@ -59,11 +50,10 @@ public class ModelAnalyzer {
 	}
 	
 	private void processPackage(Package pack, String packageOwner) throws AnalyzeException {
-		//Recursive procedure that extracts data from package elements and stores it in the 
-		// intermediate data structure
-		
-		if (pack.getName() == null) throw  
-			new AnalyzeException("Packages must have names!");
+		//Recursive procedure that extracts data from package elements and stores it in the intermediate data structure
+		if (pack.getName() == null) {
+			throw new AnalyzeException("Packages must have names!");  
+		}
 		
 		String packageName = packageOwner;
 		if (pack != root) {
@@ -71,18 +61,14 @@ public class ModelAnalyzer {
 		}
 		
 		if (pack.hasOwnedElement()) {
-			
 			for (Iterator<Element> it = pack.getOwnedElement().iterator(); it.hasNext();) {
 				Element ownedElement = it.next();
 				if (ownedElement instanceof Class) {
-					Class cl = (Class)ownedElement;
-					FMClass fmClass = getClassData(cl, packageName);
+					FMClass fmClass = getClassData((Class)ownedElement, packageName);
 					FMModel.getInstance().getClasses().add(fmClass);
 				}
-				
 				if (ownedElement instanceof Enumeration) {
-					Enumeration en = (Enumeration)ownedElement;
-					FMEnumeration fmEnumeration = getEnumerationData(en, packageName);
+					FMEnumeration fmEnumeration = getEnumerationData((Enumeration)ownedElement, packageName);
 					FMModel.getInstance().getEnumerations().add(fmEnumeration);
 				}								
 			}
@@ -96,205 +82,158 @@ public class ModelAnalyzer {
 						processPackage(ownedPackage, packageName);
 				}
 			}
-			
-			/** @ToDo:
-			  * Process other package elements, as needed */ 
 		}
 	}
 	
 	private FMClass getClassData(Class cl, String packageName) throws AnalyzeException {
-		if (cl.getName() == null) 
+		if (cl.getName() == null) {
 			throw new AnalyzeException("Classes must have names!");
-		
-		FMClass fmClass = new FMClass(cl.getName(), packageName, cl.getVisibility().toString());
-		Iterator<Property> it = ModelHelper.attributes(cl);
-		while (it.hasNext()) {
-			Property p = it.next();
-			FMProperty prop = getPropertyData(p, cl);
-			fmClass.addProperty(prop);	
 		}
 		
-		Stereotype s = StereotypesHelper.getAppliedStereotypeByString(cl, "Entity");
+		FMClass fmClass = new FMClass(cl.getName(), packageName, cl.getVisibility().toString());
+		while (ModelHelper.attributes(cl).hasNext()) {
+			fmClass.addProperty(getPropertyData(ModelHelper.attributes(cl).next(), cl));	
+		}
 		
-		if(s != null) {
-			List<?> values = StereotypesHelper.getStereotypePropertyValue(cl, s, "tableName");
-			
-			if(!((values == null) || (values.size() == 0))) {
+		Stereotype entityStereotype = StereotypesHelper.getAppliedStereotypeByString(cl, "Entity");
+		if (entityStereotype != null) {
+			List<?> values = StereotypesHelper.getStereotypePropertyValue(cl, entityStereotype, "tableName");
+			if (!((values == null) || (values.size() == 0))) {
 				fmClass.setTableName(values.get(0).toString());
 			}
 		}
-		
-		/** @ToDo:
-		 * Add import declarations etc. */		
 		return fmClass;
 	}
 	
-	private FMProperty getPropertyData(Property p, Class cl) throws AnalyzeException {
-		String attName = p.getName();
-		if (attName == null) 
-			throw new AnalyzeException("Properties of the class: " + cl.getName() +
-					" must have names!");
-		Type attType = p.getType();
-		if (attType == null)
-			throw new AnalyzeException("Property " + cl.getName() + "." +
-			p.getName() + " must have type!");
-		
-		String typeName = attType.getName();
-		if (typeName == null)
-			throw new AnalyzeException("Type ot the property " + cl.getName() + "." +
-			p.getName() + " must have name!");		
-			
-		int lower = p.getLower();
-		int upper = p.getUpper();
-		
-		FMProperty prop = new FMProperty(attName, typeName, p.getVisibility().toString(), 
-				lower, upper);
-		
-		Stereotype persistentStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "PersistentProperty");
-		
-		if(persistentStereotype != null) {
-			prop = createPersistentProperty(prop, p, persistentStereotype);
+	private FMProperty getPropertyData(Property property, Class cl) throws AnalyzeException {
+		Type attType = property.getType();
+		if (property.getName() == null) {
+			throw new AnalyzeException("Properties of the class: " + cl.getName() + " must have names!");
+		} else if (attType == null) {
+			throw new AnalyzeException("Property " + cl.getName() + "." + property.getName() + " must have type!");
+		} else if (attType.getName() == null) {
+			throw new AnalyzeException("Type ot the property " + cl.getName() + "." + property.getName() + " must have name!");
 		}
 		
-		Stereotype referencedStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "ManyToOne");
+		FMProperty fmProperty = new FMProperty(property.getName(), attType.getName(), property.getVisibility().toString(),
+												property.getLower(), property.getUpper());
 		
-		if(referencedStereotype != null) {
-			prop = createReferencedProperty(prop, p, referencedStereotype);
+		Stereotype persistentStereotype = StereotypesHelper.getAppliedStereotypeByString(property, "PersistentProperty");
+		if (persistentStereotype != null) {
+			fmProperty = createPersistentProperty(fmProperty, property, persistentStereotype);
 		}
 		
+		if (StereotypesHelper.getAppliedStereotypeByString(property, "ManyToOne") != null) {
+			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "ManyToOne"));
+		} else if (StereotypesHelper.getAppliedStereotypeByString(property, "ManyToMany") != null) {
+			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "ManyToMany"));
+		} else if (StereotypesHelper.getAppliedStereotypeByString(property, "OneToMany") != null) {
+			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "OneToMany"));
+		} else if (StereotypesHelper.getAppliedStereotypeByString(property, "OneToOne") != null) {
+			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "OneToOne"));
+		}
 		
-		
-		return prop;		
-	}	
+		return fmProperty;		
+	}
 	
-	private FMPersistentProperty createPersistentProperty(FMProperty prop, Property p, Stereotype s) {
-		
+	private FMPersistentProperty createPersistentProperty(FMProperty fmProperty, Property property, Stereotype stereotype) {
 		String columnName = null;
 		Integer length = null;
 		Integer precision = null;
 		Strategy strategy = null;
 		Boolean isKey = null;
+		Boolean isNullable = null;
 		Boolean isUnique = null;
 		
-		List<Property> tags = s.getOwnedAttribute();
-		for(int i=0; i<tags.size(); i++) {
-			Property tag = tags.get(i);
-			String tagName = tag.getName();
-			List<?> values = StereotypesHelper.getStereotypePropertyValue(p, s, tagName);
-			
-			if(values.size() > 0) {
-				switch(tagName) {
+		List<Property> tags = stereotype.getOwnedAttribute();
+		for (int i = 0; i < tags.size(); i++) {
+			List<?> stereotypePropertyValues = StereotypesHelper.getStereotypePropertyValue(property, stereotype, tags.get(i).getName());
+			if (stereotypePropertyValues.size() > 0) {
+				switch(tags.get(i).getName()) {
 					case "columnName":
-						columnName = (String) values.get(0);
+						columnName = (String) stereotypePropertyValues.get(0);
 						break;
 					case "length":
-						length = (Integer) values.get(0);
+						length = (Integer) stereotypePropertyValues.get(0);
 						break;
 					case "precision":
-						precision = (Integer) values.get(0);
+						precision = (Integer) stereotypePropertyValues.get(0);
 						break;
 					case "strategy":
-						if(values.get(0) instanceof EnumerationLiteral) {
-							strategy = Strategy.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
+						if (stereotypePropertyValues.get(0) instanceof EnumerationLiteral) {
+							strategy = Strategy.valueOf(getEnumerationString((EnumerationLiteral)stereotypePropertyValues.get(0)));
 						}
 						break;
 					case "isKey":
-						isKey = (Boolean) values.get(0);
+						isKey = (Boolean) stereotypePropertyValues.get(0);
+						break;
+					case "isNullable":
+						isNullable = (Boolean) stereotypePropertyValues.get(0);
 						break;
 					case "isUnique":
-						isUnique = (Boolean) values.get(0);
+						isUnique = (Boolean) stereotypePropertyValues.get(0);
 						break;
-					
 				}
 			}
 		}
-		
-		
-		FMPersistentProperty newProp = new FMPersistentProperty(prop, columnName, length, precision, strategy, isKey, isUnique);
-		
-		return newProp;
+		return new FMPersistentProperty(fmProperty, columnName, length, precision, strategy, isKey, isNullable, isUnique);
 	}
 	
-	private FMReferencedProperty createReferencedProperty(FMProperty prop, Property p, Stereotype s) {
-		
-		FetchType fetch = null;
-		CascadeType cascade = null;
+	private FMReferencedProperty createReferencedProperty(FMProperty fmProperty, Property property, Stereotype stereotype) {
+		FetchType fetchType = null;
+		CascadeType cascadeType = null;
 		String columnName = null;
 		String joinTable = null;
 		
-		List<Property> tags = s.getOwnedAttribute();
-		Collection<?> inheritedTags = (Collection<?>)s.getInheritedMember();
+		List<Property> tags = stereotype.getOwnedAttribute();
+		for (Iterator<?> iterator = stereotype.getInheritedMember().iterator(); iterator.hasNext();) {
+			tags.add((Property)iterator.next());
+		}	
 		
-		for(Iterator<?> i = inheritedTags.iterator(); i.hasNext();) {
-			tags.add((Property)i.next());
-		}
-		
-		
-		
-		for(int i=0; i<tags.size(); i++) {
-			Property tag = tags.get(i);
-			String tagName = tag.getName();
-			List<?> values = StereotypesHelper.getStereotypePropertyValue(p, s, tagName);
-			
+		for (int i = 0; i < tags.size(); i++) {
+			List<?> values = StereotypesHelper.getStereotypePropertyValue(property, stereotype, tags.get(i).getName());
 			if(values.size() > 0) {
-				switch(tagName) {
+				switch(tags.get(i).getName()) {
 					case "columnName":
 						columnName = (String) values.get(0);
 						break;
 					case "fetch":
 						if(values.get(0) instanceof EnumerationLiteral) {
-							fetch = FetchType.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
+							fetchType = FetchType.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
 						}
 						break;
 					case "cascade":
 						if(values.get(0) instanceof EnumerationLiteral) {
-							cascade = CascadeType.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
+							cascadeType = CascadeType.valueOf(getEnumerationString((EnumerationLiteral)values.get(0)));
 						}
 						break;
 					case "joinTable":
 						joinTable = (String) values.get(0);
 						break;
-					
 				}
 			}
 		}
 		
+		Property opposite = property.getOpposite();
+		FMReferencedProperty oppositeEnd = new FMReferencedProperty(new FMProperty(opposite.getName(), opposite.getType().toString(),
+				opposite.getVisibility().toString(), (Integer)opposite.getLower(), (Integer)opposite.getUpper()));
 		
-		Property oppositeEnd = p.getOpposite();
-		
-		FMReferencedProperty newProp = new FMReferencedProperty(prop);
-		newProp.setFetchType(fetch);
-		newProp.setCascadeType(cascade);
-		newProp.setColumnName(columnName);
-		newProp.setJoinTable(joinTable);
-		
-		
-		FMProperty fmp = new FMProperty(oppositeEnd.getName(), oppositeEnd.getType().toString(), oppositeEnd.getVisibility().toString(), (Integer)oppositeEnd.getLower(), (Integer)oppositeEnd.getUpper());
-		
-		newProp.setOppositeEnd(new FMReferencedProperty(fmp));
-		
-		return newProp;
-	
+		return new FMReferencedProperty(fmProperty, fetchType, cascadeType, columnName, joinTable, oppositeEnd);
 	}
 	
-	private String getEnumerationString(EnumerationLiteral en) {
-		String enumString = en.getName();
-		
-		return enumString;
+	private String getEnumerationString(EnumerationLiteral enumerationLiteral) {
+		return enumerationLiteral.getName();
 	}
 	
 	private FMEnumeration getEnumerationData(Enumeration enumeration, String packageName) throws AnalyzeException {
 		FMEnumeration fmEnum = new FMEnumeration(enumeration.getName(), packageName);
-		List<EnumerationLiteral> list = enumeration.getOwnedLiteral();
-		for (int i = 0; i < list.size() - 1; i++) {
-			EnumerationLiteral literal = list.get(i);
-			if (literal.getName() == null)  
-				throw new AnalyzeException("Items of the enumeration " + enumeration.getName() +
-				" must have names!");
-			fmEnum.addValue(literal.getName());
+		for (int i = 0; i < enumeration.getOwnedLiteral().size() - 1; i++) {
+			String literalName = enumeration.getOwnedLiteral().get(i).getName();
+			if (literalName == null) {
+				throw new AnalyzeException("Items of the enumeration " + enumeration.getName() + " must have names!");
+			}
+			fmEnum.addValue(literalName);
 		}
 		return fmEnum;
-	}	
-	
-	
+	}
 }

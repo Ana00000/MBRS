@@ -1,10 +1,7 @@
 package myplugin.generator.fmmodel;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
-
-
 
 public class FMEnumeration extends FMType {
 	private ArrayList <String> Values = new ArrayList<String>();

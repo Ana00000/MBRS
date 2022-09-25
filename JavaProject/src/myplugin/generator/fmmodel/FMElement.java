@@ -21,6 +21,4 @@ public abstract class FMElement {
 	public Boolean hasName() {
 		return name != null;
 	}
-
-	
 }

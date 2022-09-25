@@ -7,9 +7,7 @@ import com.nomagic.actions.NMAction;
 import com.nomagic.magicdraw.actions.MDActionsCategory;
 
 public class MainMenuConfigurator implements AMConfigurator
-{
-	
-	
+{	
 	/**
 	 * Actions that will be added to manager.
 	 */
@@ -31,14 +29,13 @@ public class MainMenuConfigurator implements AMConfigurator
 	public void configure(ActionsManager mngr)
 	{
 		ActionsCategory category = (ActionsCategory) mngr.getActionFor("Code Generation");
-		
 		if( category == null )
 		{
 			category = new MDActionsCategory("Code Generation", "Code Generation");
 			category.setNested(true);
 			mngr.addCategory(category);
 		}
-		for(int i=0;i<actions.length;i++) {
+		for (int i = 0;i < actions.length; i++) {
 		   category.addAction(actions[i]);
 		}
 	}
@@ -47,5 +44,4 @@ public class MainMenuConfigurator implements AMConfigurator
 	{
 		return AMConfigurator.MEDIUM_PRIORITY;
 	}
-
 }

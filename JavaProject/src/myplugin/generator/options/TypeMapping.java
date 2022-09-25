@@ -1,12 +1,8 @@
 package myplugin.generator.options;
 
-/** TypeMapping: UML 2.0 to java (or any other destination language) type mapping */
-
 public class TypeMapping {
 	private String uMLType;
 	private String destType;
-	
-	//libraryName: name used for import declaration  
 	private String libraryName;
 	
 	public TypeMapping(String uMLType, String destType, String libraryName) {
@@ -39,7 +35,4 @@ public class TypeMapping {
 	public void setLibraryName(String libraryName) {
 		this.libraryName = libraryName;
 	}
-	
-	
-	
 }

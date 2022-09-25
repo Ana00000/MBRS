@@ -1,7 +1,6 @@
 package myplugin.generator.fmmodel;
 
 public class FMReferencedProperty extends FMProperty {
-	
 	private FetchType fetchType;
 	private CascadeType cascadeType;
 	private String columnName;
@@ -10,6 +9,16 @@ public class FMReferencedProperty extends FMProperty {
 	
 	public FMReferencedProperty(FMProperty fmProperty) {
 		super(fmProperty.getName(), fmProperty.getType(), fmProperty.getVisibility(),fmProperty.getLower(), fmProperty.getUpper());
+	}
+
+	public FMReferencedProperty(FMProperty fmProperty, FetchType fetchType, CascadeType cascadeType, String columnName, 
+			String joinTable, FMReferencedProperty oppositeEnd) {
+		super(fmProperty.getName(), fmProperty.getType(), fmProperty.getVisibility(),fmProperty.getLower(), fmProperty.getUpper());
+		this.fetchType = fetchType;
+		this.cascadeType = cascadeType;
+		this.columnName = columnName;
+		this.joinTable = joinTable;
+		this.oppositeEnd = oppositeEnd;
 	}
 
 	public FetchType getFetchType() {
@@ -51,5 +60,4 @@ public class FMReferencedProperty extends FMProperty {
 	public void setOppositeEnd(FMReferencedProperty oppositeEnd) {
 		this.oppositeEnd = oppositeEnd;
 	}
-
 }

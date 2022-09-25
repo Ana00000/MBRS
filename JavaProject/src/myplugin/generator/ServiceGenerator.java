@@ -31,7 +31,6 @@ public class ServiceGenerator extends BasicGenerator {
 			FMClass cl = classes.get(i);
 			Writer out;
 			Map<String, Object> context = new HashMap<String, Object>();
-
 			try {
 				out = getWriter(cl.getName(), cl.getTypePackage());
 				if (out != null) {

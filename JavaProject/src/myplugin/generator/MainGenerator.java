@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class MainGenerator extends BasicGenerator {
 
-	public final String PACKAGE_NAME = "naziv_paketa_gde_je_smesten_java_projekat";
+	public final String PACKAGE_NAME = "java_project_placement";
 	public final String PROJECT_NAME = Application.getInstance().getProject().getName();
 
 	public MainGenerator(GeneratorOptions generatorOptions) {
@@ -42,6 +42,5 @@ public class MainGenerator extends BasicGenerator {
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
-
 	}
 }

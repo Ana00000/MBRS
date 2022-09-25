@@ -70,6 +70,4 @@ public class GeneratorOptions  {
 	public void setFilePackage(String filePackage) {
 		this.filePackage = filePackage;
 	}
-	
-	
 }
