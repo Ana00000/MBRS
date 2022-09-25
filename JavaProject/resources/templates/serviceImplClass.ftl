@@ -5,19 +5,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import java.util.Collection;
 
-<#assign mylist=class.typePackage?split(".")>
-
-
-<#assign x=mylist?size-2>
-<#assign baseDir=mylist[0]>
-
-<#list 1..x as i>
-	<#assign baseDir = baseDir+"."+mylist[i]>
-</#list>
-
-import ${baseDir}.model.*;
-import ${baseDir}.service.*;
-import ${baseDir}.repository.*;
+import mbrs.team6.repository.${class.name}Repository;
+import mbrs.team6.service.${class.name}Service;
+import mbrs.team6.model.${class.name};
 
 @Service
 @Qualifier("${class.name?uncap_first}ServiceImpl")
