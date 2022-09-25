@@ -4,18 +4,18 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 
-<#assign mylist=class.typePackage?split(".")>
-
-
-<#assign x=mylist?size-2>
-<#assign baseDir=mylist[0]>
-
-<#list 1..x as i>
-	<#assign baseDir = baseDir+"."+mylist[i]>
+import mbrs.team6.model.${class.name};
+<#list referencedProperties as property>
+import mbrs.team6.model.${property.type?cap_first};
 </#list>
 
-import ${baseDir}.model.*;
-import ${baseDir}.service.*;
+import java.util.Collection;
+
+import mbrs.team6.service.${class.name}Service;
+<#list referencedProperties as property>
+import mbrs.team6.service.${property.type?cap_first}Service;
+</#list>
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;

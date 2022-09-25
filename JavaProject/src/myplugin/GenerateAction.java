@@ -39,46 +39,74 @@ class GenerateAction extends MDAction{
 
 	@SuppressWarnings("deprecation")
 	public void actionPerformed(ActionEvent evt) {
-		if (Application.getInstance().getProject() == null || Application.getInstance().getProject().getModel() == null) {
-			return;
-		}
+		if (Application.getInstance().getProject() == null) return;
+		Package root = Application.getInstance().getProject().getModel();
+		
+		if (root == null) return;
+		
+		ModelAnalyzer analyzer1 = new ModelAnalyzer(root, "mbrs.team6.model");
+		
+		ModelAnalyzer analyzer2 = new ModelAnalyzer(root, "mbrs.team6.controller");
+		
+		ModelAnalyzer analyzer3 = new ModelAnalyzer(root, "mbrs.team6.enums");
+
+		ModelAnalyzer analyzer4 = new ModelAnalyzer(root, "mbrs.team6");
+		
+		ModelAnalyzer analyzer5 = new ModelAnalyzer(root, "mbrs.team6.repository");
+		
+		ModelAnalyzer analyzer6 = new ModelAnalyzer(root, "mbrs.team6.service");
+		
+		ModelAnalyzer analyzer7 = new ModelAnalyzer(root, "mbrs.team6.service.impl");
+		
+		ModelAnalyzer analyzer8 = new ModelAnalyzer(root, "mbrs.team6");
+		
+		ModelAnalyzer analyzer9 = new ModelAnalyzer(root, "mbrs.team6");
 		
 		try {
-			new ModelAnalyzer(Application.getInstance().getProject().getModel(), "ejb").prepareModel();	
+			//new ModelAnalyzer(Application.getInstance().getProject().getModel(), "ejb").prepareModel();	
 			
 			Map<String, GeneratorOptions> generatorOptions = ProjectOptions.getProjectOptions().getGeneratorOptions();
+			analyzer1.prepareModel();
 			GeneratorOptions ejbGeneratorOptions = generatorOptions.get("EJBGenerator");
 			new EJBGenerator(ejbGeneratorOptions).generate();
 			showGeneratedDialog(ejbGeneratorOptions);
 			
+			analyzer2.prepareModel();
 			GeneratorOptions controllerGeneratorOptions = generatorOptions.get("ControllerGenerator");
 			new ControllerGenerator(controllerGeneratorOptions).generate();
 			showGeneratedDialog(controllerGeneratorOptions);
 			
+			analyzer3.prepareModel();
 			GeneratorOptions enumGeneratorOptions = generatorOptions.get("EnumGenerator");
 			new EnumGenerator(enumGeneratorOptions).generate();
 			showGeneratedDialog(enumGeneratorOptions);
 			
+			analyzer4.prepareModel();
 			GeneratorOptions mainGeneratorOptions = generatorOptions.get("MainGenerator");
 			new MainGenerator(mainGeneratorOptions).generate();
 			showGeneratedDialog(mainGeneratorOptions);
 			
+			analyzer5.prepareModel();
 			GeneratorOptions repositoryGeneratorOptions = generatorOptions.get("RepositoryGenerator");
 			new RepositoryGenerator(repositoryGeneratorOptions).generate();
 			showGeneratedDialog(repositoryGeneratorOptions);
 			
+			analyzer6.prepareModel();
 			GeneratorOptions serviceGeneratorOptions = generatorOptions.get("ServiceGenerator");
 			new ServiceGenerator(serviceGeneratorOptions).generate();
 			showGeneratedDialog(serviceGeneratorOptions);
 			
+			analyzer7.prepareModel();
 			GeneratorOptions serviceImplGeneratorOptions = generatorOptions.get("ServiceImplGenerator");
 			new ServiceImplGenerator(serviceImplGeneratorOptions).generate();
 			showGeneratedDialog(serviceImplGeneratorOptions);
 			
+			analyzer8.prepareModel();
 			GeneratorOptions pomGeneratorOptions = generatorOptions.get("PomGenerator");
 			new PomGenerator(pomGeneratorOptions).generate();
 			showGeneratedDialog(pomGeneratorOptions);
 			
+			analyzer9.prepareModel();
 			GeneratorOptions applicationPropertiesGeneratorOptions = generatorOptions.get("ApplicationPropertiesGenerator");
 			new ApplicationPropertiesGenerator(applicationPropertiesGeneratorOptions).generate();
 			showGeneratedDialog(applicationPropertiesGeneratorOptions);

@@ -1,17 +1,8 @@
 package ${class.typePackage};
 
 import java.util.*;
-<#assign mylist=class.typePackage?split(".")>
 
-
-<#assign x=mylist?size-2>
-<#assign baseDir=mylist[0]>
-
-<#list 1..x as i>
-	<#assign baseDir = baseDir+"."+mylist[i]>
-</#list>
-
-import ${baseDir}.model.*;
+import mbrs.team6.model.${class.name};
 import org.springframework.stereotype.Service;
 
 @Service
