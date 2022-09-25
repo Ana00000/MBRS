@@ -91,8 +91,11 @@ public class ModelAnalyzer {
 		}
 		
 		FMClass fmClass = new FMClass(cl.getName(), packageName, cl.getVisibility().toString());
-		while (ModelHelper.attributes(cl).hasNext()) {
-			fmClass.addProperty(getPropertyData(ModelHelper.attributes(cl).next(), cl));	
+		Iterator<Property> it = ModelHelper.attributes(cl);
+		while (it.hasNext()) {
+			Property p = it.next();
+			FMProperty prop = getPropertyData(p, cl);
+			fmClass.addProperty(prop);	
 		}
 		
 		Stereotype entityStereotype = StereotypesHelper.getAppliedStereotypeByString(cl, "Entity");
