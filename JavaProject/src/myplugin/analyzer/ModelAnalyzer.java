@@ -2,6 +2,7 @@ package myplugin.analyzer;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 import myplugin.generator.fmmodel.FMClass;
 import myplugin.generator.fmmodel.FMEnumeration;
@@ -9,6 +10,9 @@ import myplugin.generator.fmmodel.FMModel;
 import myplugin.generator.fmmodel.FMProperty;
 import myplugin.generator.fmmodel.FMPersistentProperty;
 import myplugin.generator.fmmodel.FMReferencedProperty;
+import myplugin.generator.fmmodel.FMMethod;
+import myplugin.generator.fmmodel.FMParameter;
+import myplugin.generator.fmmodel.FMType;
 import myplugin.generator.fmmodel.Strategy;
 import myplugin.generator.fmmodel.FetchType;
 import myplugin.generator.fmmodel.CascadeType;
@@ -21,8 +25,11 @@ import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Package;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Class;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Enumeration;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Property;
+import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Operation;
 import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Type;
+import com.nomagic.uml2.ext.magicdraw.classes.mdkernel.Parameter;
 import com.nomagic.uml2.ext.magicdraw.mdprofiles.Stereotype;
+
 
 /** Model Analyzer takes necessary metadata from the MagicDraw model and puts it in 
  * the intermediate data structure (@see myplugin.generator.fmmodel.FMModel) optimized
@@ -94,8 +101,14 @@ public class ModelAnalyzer {
 		Iterator<Property> it = ModelHelper.attributes(cl);
 		while (it.hasNext()) {
 			Property p = it.next();
-			FMProperty prop = getPropertyData(p, cl);
-			fmClass.addProperty(prop);	
+			
+			if (p.getOpposite() != null) {
+				FMReferencedProperty referencedProperty = getReferencedPropertyData(p, cl);
+				fmClass.addReferencedProperty(referencedProperty);
+			} else {
+				FMProperty prop = getPropertyData(p, cl);
+				fmClass.addProperty(prop);
+			}
 		}
 		
 		Stereotype entityStereotype = StereotypesHelper.getAppliedStereotypeByString(cl, "Entity");
@@ -105,7 +118,75 @@ public class ModelAnalyzer {
 				fmClass.setTableName(values.get(0).toString());
 			}
 		}
+		
+		Iterator<Operation> op = ModelHelper.operations(cl);
+		while (op.hasNext()) {
+			Operation o = op.next();
+			FMMethod met = getMethodData(o, cl);
+			
+			fmClass.addMethod(met);
+		}
+		
 		return fmClass;
+	}
+	
+	private FMMethod getMethodData(Operation o, Class cl) throws AnalyzeException {
+		String methodName = o.getName();
+		if (methodName == null) 
+			throw new AnalyzeException("Operations of the class: " + cl.getName() +
+					" must have names!");
+		
+		String methodVisibility = o.getVisibility().toString();
+		if (methodVisibility == null) 
+			throw new AnalyzeException("Operations of the class: " + cl.getName() +
+					" must have visibility!");
+		
+		Type methodType = o.getType();
+		if (methodType == null) 
+			throw new AnalyzeException("Operations of the class: " + cl.getName() +
+					" must have a return type!");
+		
+		String typeName = methodType.getName();
+		if (typeName == null) 
+			throw new AnalyzeException("Operations of the class: " + cl.getName() +
+					" must have a return type name!");
+		
+		FMType retType = new FMType(typeName, "");
+		
+		FMMethod met = new FMMethod(methodVisibility, retType, methodName);
+		
+		List<FMParameter> parameters = new ArrayList<>();
+		
+		Iterator<Parameter> it = o.getOwnedParameter().iterator();	
+		while (it.hasNext()) {
+			Parameter p = it.next();
+			if (p.getDirection().toString().equals("in")) {
+				FMParameter par = getParameterData(p, met);
+				parameters.add(par);
+			}
+		}
+		
+		met.setParameters(parameters);
+		
+		return met;
+	}
+	
+	private FMParameter getParameterData(Parameter p, FMMethod met) throws AnalyzeException {
+		String parName = p.getName();
+		if (parName == null) 
+			throw new AnalyzeException("Parameters of the operation: " + met.getName() +
+					" must have names!");
+		
+		String parType = p.getType().getName();
+		if (parType == null) 
+			throw new AnalyzeException("Parameters of the operation: " + met.getName() +
+					" must have types!");
+		
+		FMType parameterType = new FMType(parType, "");
+		
+		FMParameter par = new FMParameter(parameterType, parName);
+		
+		return par;
 	}
 	
 	private FMProperty getPropertyData(Property property, Class cl) throws AnalyzeException {
@@ -223,6 +304,81 @@ public class ModelAnalyzer {
 		
 		return new FMReferencedProperty(fmProperty, fetchType, cascadeType, columnName, joinTable, oppositeEnd);
 	}
+	
+	private FMReferencedProperty getReferencedPropertyData(Property p, Class cl) throws AnalyzeException {
+		Stereotype referencedPropertyStereotype = null;
+		
+		String cascade = null;
+		String fetchType = null;
+		String mappedBy = null;
+		String joinTable = null;
+		String columnName = null;
+		int upper = p.getUpper();
+		Integer oppositeEnd = p.getOpposite().getUpper();
+		if(upper == -1 && oppositeEnd == -1) {
+			referencedPropertyStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "ManyToMany");
+		} else if(upper == -1 && oppositeEnd == 1) {
+			referencedPropertyStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "OneToMany");
+		} else if(upper == 1 && oppositeEnd == -1) {
+			referencedPropertyStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "ManyToOne");
+		} else {
+			referencedPropertyStereotype = StereotypesHelper.getAppliedStereotypeByString(p, "OneToOne");
+		}
+		
+		if(referencedPropertyStereotype != null) {
+			List<Property> tags = referencedPropertyStereotype.getOwnedAttribute();
+			for (int j = 0; j < tags.size(); ++j) {
+				Property tagDef = tags.get(j);
+				String tagName = tagDef.getName();
+				String value = getTagValue(p, referencedPropertyStereotype, tagName);
+			
+				switch (tagName) {
+					case "cascade":
+						cascade = value;
+						break;
+					case "fetch":
+						fetchType = value;
+						break;
+					case "joinTable":
+						joinTable = value;
+						break;
+					case "mappedBy":
+						mappedBy = value;
+						break;
+					case "columnName":
+						columnName = value;
+						break;
+				}
+			}
+		}
+		
+		String attName = p.getName();
+		if (attName == null) 
+			throw new AnalyzeException("Properties of the class: " + cl.getName() +
+					" must have names!");
+		Type attType = p.getType();
+		if (attType == null)
+			throw new AnalyzeException("Property " + cl.getName() + "." +
+			p.getName() + " must have type!");
+		String typeName = attType.getName();
+		if (typeName == null)
+			throw new AnalyzeException("Type ot the property " + cl.getName() + "." +
+			p.getName() + " must have name!");		
+		FMReferencedProperty prop = new FMReferencedProperty(attName, typeName, p.getVisibility().toString(),
+				p.getLower(), p.getUpper(), cascade, fetchType, joinTable, columnName, oppositeEnd);
+		return prop;
+	}
+	
+	private String getTagValue(Element el, Stereotype s, String tagName) {
+		List<String> value = StereotypesHelper.getStereotypePropertyValueAsString(el, s, tagName);
+		if(value == null)
+			return null;
+		if(value.size() == 0)
+			return null;
+		return value.get(0);
+		
+	}
+	
 	
 	private String getEnumerationString(EnumerationLiteral enumerationLiteral) {
 		return enumerationLiteral.getName();
