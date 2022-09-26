@@ -12,8 +12,6 @@ public class FMClass extends FMType {
 	private List<String> importedPackages = new ArrayList<String>();
 	private List<FMReferencedProperty> referencedProperties = new ArrayList<>();
 	private String label;
-	/** @ToDo: add list of methods */
-	private List<FMMethod> methods = new ArrayList<FMMethod>();
 
 	public FMClass(String name, String classPackage, String visibility) {
 		super(name, classPackage);		
@@ -93,19 +91,5 @@ public class FMClass extends FMType {
 		referencedProperties.add(property);
 	}
 	
-	public List<FMMethod> getMethods() {
-		return methods;
-	}
-
-	public Iterator<FMMethod> getMethodIterator() {
-		return methods.iterator();
-	}
-
-	public void addMethod(FMMethod method) {
-		methods.add(method);
-	}
-
-	public int getMethodCount() {
-		return methods.size();
-	}
+	
 }
