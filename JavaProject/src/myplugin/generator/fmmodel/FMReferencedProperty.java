@@ -1,27 +1,19 @@
 package myplugin.generator.fmmodel;
 
 public class FMReferencedProperty extends FMProperty {
-	private String fetchType;
-	private String cascadeType;
+	private FetchType fetchType;
+	private CascadeType cascadeType;
 	private String columnName;
 	private String joinTable;
-	private Integer oppositeEnd;
+	private FMReferencedProperty oppositeEnd;
 	
 	public FMReferencedProperty(FMProperty fmProperty) {
 		super(fmProperty.getName(), fmProperty.getType(), fmProperty.getVisibility(),fmProperty.getLower(), fmProperty.getUpper());
 	}
 
-	public FMReferencedProperty(String name, String type, String visibility, int lower, int upper, String cascade,
-			String fetch, String joinTable, String columnName, Integer oppositeEnd) {
-		super(name, type, visibility, lower, upper);
-		this.cascadeType = cascade;
-		this.fetchType = fetch;
-		this.joinTable = joinTable;
-		this.columnName = columnName;
-		this.oppositeEnd = oppositeEnd;
-	}
 	
-	/*public FMReferencedProperty(FMProperty fmProperty, FetchType fetchType, CascadeType cascadeType, String columnName, 
+	
+	public FMReferencedProperty(FMProperty fmProperty, FetchType fetchType, CascadeType cascadeType, String columnName, 
 			String joinTable, FMReferencedProperty oppositeEnd) {
 		super(fmProperty.getName(), fmProperty.getType(), fmProperty.getVisibility(),fmProperty.getLower(), fmProperty.getUpper());
 		this.fetchType = fetchType;
@@ -29,36 +21,36 @@ public class FMReferencedProperty extends FMProperty {
 		this.columnName = columnName;
 		this.joinTable = joinTable;
 		this.oppositeEnd = oppositeEnd;
-	}*/
+	}
 
-	public Integer getOppositeEnd() {
+	public FMReferencedProperty getOppositeEnd() {
 		return oppositeEnd;
 	}
 
 
 
-	public void setOppositeEnd(Integer oppositeEnd) {
+	public void setOppositeEnd(FMReferencedProperty oppositeEnd) {
 		this.oppositeEnd = oppositeEnd;
 	}
 
 
 
-	public String getCascade() {
+	public CascadeType getCascade() {
 		return cascadeType;
 	}
 
 
-	public void setCascade(String cascade) {
+	public void setCascade(CascadeType cascade) {
 		this.cascadeType = cascade;
 	}
 
 
-	public String getFetch() {
+	public FetchType getFetch() {
 		return fetchType;
 	}
 
 
-	public void setFetch(String fetch) {
+	public void setFetch(FetchType fetch) {
 		this.fetchType = fetch;
 	}
 
