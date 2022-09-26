@@ -28,6 +28,33 @@ public class ${class.name}ServiceImpl implements ${class.name}Service {
     @Override
     public List<${class.name}> findAll(){
         return ${class.name?uncap_first}Repository.findAll();
+	}
 	
-   
+	<#list properties as property>
+		<#if property.name != "id" && property.upper == 1>
+	@Override
+	public List<${class.name}> findBy${property.name?cap_first}(${property.type} ${property.name}){
+		return ${class.name?uncap_first}Repository.findBy${property.name?cap_first}(${property.name});
+	}
+		</#if>
+	</#list>
+	
+	@Override
+	public ${class.name} save(${class.name} ${class.name?uncap_first}){
+		return ${class.name?uncap_first}Repository.save(${class.name?uncap_first});
+	}
+	
+	@Override
+	public ${class.name} update(${class.name} ${class.name?uncap_first}) throws Exception{
+		${class.name} ${class.name?uncap_first}ToSave = ${class.name?uncap_first}Repository.findById(id).get();
+		<#list properties as property>${class.name?uncap_first}ToSave.set${property.name?cap_first}(${class.name?uncap_first}.get${property.name?cap_first}())<#sep>;
+    	</#sep></#list>;
+        return ${class.name?uncap_first}Repository.save(${class.name?uncap_first}ToSave);
+	}
+	
+	@Override
+	public ${class.name} delete(Long id)  throws Exception{
+		${class.name?uncap_first}Repository.deleteById(id);
+	}
+	
 }

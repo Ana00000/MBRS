@@ -48,7 +48,7 @@ ${class.visibility} class ${class.name}Controller {
     
     @GetMapping("/{id}")
 	public ResponseEntity<${class.name}> getById(@PathVariable("id") Long id) {
-		return new ResponseEntity<${class.name}>(${class.name?uncap_first}Service.getById(id), HttpStatus.OK);
+		return new ResponseEntity<${class.name}>(${class.name?uncap_first}Service.findOne(id), HttpStatus.OK);
     }
     
     @PutMapping("/{id}")
