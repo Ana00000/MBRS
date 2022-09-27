@@ -134,13 +134,13 @@ public class ModelAnalyzer {
 		}
 		
 		if (StereotypesHelper.getAppliedStereotypeByString(property, "ManyToOne") != null) {
-			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "ManyToOne"));
+			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "ManyToOne"), "ManyToOne");
 		} else if (StereotypesHelper.getAppliedStereotypeByString(property, "ManyToMany") != null) {
-			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "ManyToMany"));
+			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "ManyToMany"), "ManyToMany");
 		} else if (StereotypesHelper.getAppliedStereotypeByString(property, "OneToMany") != null) {
-			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "OneToMany"));
+			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "OneToMany"), "OneToMany");
 		} else if (StereotypesHelper.getAppliedStereotypeByString(property, "OneToOne") != null) {
-			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "OneToOne"));
+			fmProperty = createReferencedProperty(fmProperty, property, StereotypesHelper.getAppliedStereotypeByString(property, "OneToOne"), "OneToOne");
 		}
 		
 		return fmProperty;		
@@ -189,7 +189,7 @@ public class ModelAnalyzer {
 		return new FMPersistentProperty(fmProperty, columnName, length, precision, strategy, isKey, isNullable, isUnique);
 	}
 	
-	private FMReferencedProperty createReferencedProperty(FMProperty fmProperty, Property property, Stereotype stereotype) {
+	private FMReferencedProperty createReferencedProperty(FMProperty fmProperty, Property property, Stereotype stereotype, String relationship) {
 		FetchType fetchType = null;
 		CascadeType cascadeType = null;
 		String columnName = null;
@@ -228,7 +228,11 @@ public class ModelAnalyzer {
 		FMReferencedProperty oppositeEnd = new FMReferencedProperty(new FMProperty(opposite.getName(), opposite.getType().toString(),
 				opposite.getVisibility().toString(), (Integer)opposite.getLower(), (Integer)opposite.getUpper()));
 		
-		return new FMReferencedProperty(fmProperty, fetchType, cascadeType, columnName, joinTable, oppositeEnd);
+		FMReferencedProperty retVal = new FMReferencedProperty(fmProperty, fetchType, cascadeType, columnName, joinTable, oppositeEnd);
+		
+		retVal.setRelationship(relationship);
+		
+		return retVal;
 	}
 	
 	

@@ -2,7 +2,7 @@ package ${class.typePackage};
 
 import java.util.*;
 
-import mbrs.team6.model.${class.name};
+import com.example.demo.model.${class.name};
 import org.springframework.stereotype.Service;
 
 @Service

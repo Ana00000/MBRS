@@ -29,6 +29,7 @@ public class RepositoryGenerator  extends BasicGenerator {
 		List<FMClass> classes = FMModel.getInstance().getClasses();
 		for (int i = 0; i < classes.size(); i++) {
 			FMClass cl = classes.get(i);
+			cl.setTypePackage(this.getFilePackage());
 			Writer out;
 			Map<String, Object> context = new HashMap<String, Object>();
 			try {

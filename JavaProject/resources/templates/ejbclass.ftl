@@ -39,11 +39,11 @@ ${class.visibility} class ${class.name} {
    </#if>
 
 <#else>
-<#if property.upper == -1 && property.oppositeEnd?has_content == false>
+<#if property.relationship == "ManyToMany">
     @ManyToMany
-	<#elseif property.upper == -1 && property.oppositeEnd?has_content>
+	<#elseif property.relationship == "OneToMany">
     @OneToMany
-	<#elseif property.upper == 1 && property.oppositeEnd?has_content == false>
+	<#elseif property.relationship == "ManyToOne">
     @ManyToOne
 	<#else>
     @OneToOne
