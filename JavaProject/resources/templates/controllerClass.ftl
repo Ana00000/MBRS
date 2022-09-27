@@ -4,16 +4,16 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 
-import mbrs.team6.model.${class.name};
+import com.example.demo.model.${class.name};
 <#list referencedProperties as property>
-import mbrs.team6.model.${property.type?cap_first};
+import com.example.demo.model.${property.type?cap_first};
 </#list>
 
 import java.util.Collection;
 
-import mbrs.team6.service.${class.name}Service;
+import com.example.demo.service.${class.name}Service;
 <#list referencedProperties as property>
-import mbrs.team6.service.${property.type?cap_first}Service;
+import com.example.demo.service.${property.type?cap_first}Service;
 </#list>
 
 import javax.validation.Valid;

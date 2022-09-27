@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import java.util.Collection;
 
-import mbrs.team6.repository.${class.name}Repository;
-import mbrs.team6.service.${class.name}Service;
-import mbrs.team6.model.${class.name};
+import com.example.demo.repository.${class.name}Repository;
+import com.example.demo.service.${class.name}Service;
+import com.example.demo.model.${class.name};
 
 @Service
 @Qualifier("${class.name?uncap_first}ServiceImpl")

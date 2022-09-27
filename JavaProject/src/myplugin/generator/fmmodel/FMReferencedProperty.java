@@ -6,6 +6,7 @@ public class FMReferencedProperty extends FMProperty {
 	private String columnName;
 	private String joinTable;
 	private FMReferencedProperty oppositeEnd;
+	private String relationship;
 	
 	public FMReferencedProperty(FMProperty fmProperty) {
 		super(fmProperty.getName(), fmProperty.getType(), fmProperty.getVisibility(),fmProperty.getLower(), fmProperty.getUpper());
@@ -72,5 +73,13 @@ public class FMReferencedProperty extends FMProperty {
 
 	public void setColumnName(String columnName) {
 		this.columnName = columnName;
+	}
+	
+	public String getRelationship() {
+		return relationship;
+	}
+	
+	public void setRelationship(String relationship) {
+		this.relationship = relationship;
 	}
 }
