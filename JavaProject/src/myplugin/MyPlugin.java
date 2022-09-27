@@ -25,10 +25,10 @@ public class MyPlugin extends Plugin {
 		Map<String, GeneratorOptions> generatorOptions = ProjectOptions.getProjectOptions().getGeneratorOptions();
 		pluginDir = getDescriptor().getPluginDirectory().getPath();
 		String rootDir = System.getProperty("user.home") + File.separator + "PluginDevelopment";
-		String javaDir = rootDir + File.separator + "src" + File.separator + "main" + File.separator + "java";
+		String javaDir = rootDir + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + "com" + File.separator + "example" + File.separator + "demo";
 		
 		//for test purpose only:
-		GeneratorOptions ejbOptions = new GeneratorOptions(javaDir, "ejbclass", "templates", "{0}.java", true, "ejb"); 				
+		GeneratorOptions ejbOptions = new GeneratorOptions(javaDir + File.separator + "model", "ejbclass", "templates", "{0}.java", true, "com.example.demo.model"); 				
 		generatorOptions.put("EJBGenerator", ejbOptions);			
 		ejbOptions.setTemplateDir(pluginDir + File.separator + ejbOptions.getTemplateDir());
 		
@@ -36,22 +36,22 @@ public class MyPlugin extends Plugin {
 		generatorOptions.put("EnumGenerator", enumOptions); 
 		enumOptions.setTemplateDir(pluginDir + File.separator +  enumOptions.getTemplateDir());
 		
-		GeneratorOptions repositoryOptions = new GeneratorOptions(javaDir, "repositoryclass", "templates", "{0}Repository.java", true, "repository");
+		GeneratorOptions repositoryOptions = new GeneratorOptions(javaDir + File.separator + "repository", "repositoryclass", "templates", "{0}Repository.java", true, "com.example.demo.repository");
 		generatorOptions.put("RepositoryGenerator", repositoryOptions);
 		repositoryOptions.setTemplateDir(pluginDir + File.separator + repositoryOptions.getTemplateDir());
 		
 		
-		GeneratorOptions serviceOptions = new GeneratorOptions(javaDir, "serviceClass", "templates", "{0}Service.java", true, "service");
+		GeneratorOptions serviceOptions = new GeneratorOptions(javaDir + File.separator + "service", "serviceClass", "templates", "{0}Service.java", true, "com.example.demo.service");
 		generatorOptions.put("ServiceGenerator", serviceOptions);
 		serviceOptions.setTemplateDir(pluginDir + File.separator + serviceOptions.getTemplateDir());
 		
 		
-		GeneratorOptions serviceImplOptions = new GeneratorOptions(javaDir, "serviceImplClass", "templates", "{0}ServiceImpl.java", true, "service.impl");
+		GeneratorOptions serviceImplOptions = new GeneratorOptions(javaDir + File.separator + "service" + File.separator + "impl", "serviceImplClass", "templates", "{0}ServiceImpl.java", true, "com.example.demo.service.impl");
 		generatorOptions.put("ServiceImplGenerator", serviceImplOptions);
 		serviceImplOptions.setTemplateDir(pluginDir + File.separator + serviceImplOptions.getTemplateDir());
 		
 		
-		GeneratorOptions controllerOptions = new GeneratorOptions(javaDir, "controllerClass", "templates", "{0}Controller.java", true, "controller");
+		GeneratorOptions controllerOptions = new GeneratorOptions(javaDir + File.separator + "controller", "controllerClass", "templates", "{0}Controller.java", true, "com.example.demo.controller");
 		generatorOptions.put("ControllerGenerator", controllerOptions);
 		controllerOptions.setTemplateDir(pluginDir + File.separator + controllerOptions.getTemplateDir());
 		
